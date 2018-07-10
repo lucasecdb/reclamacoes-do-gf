@@ -33,8 +33,6 @@ reclamacoes_l = reclamacoes %>%
     gather(key = "lexico",
            value = "polaridade",
            sentimento_op30, sentimento_sent)
-
-reclamacoes_l %>% View()
 ```
 
 Converte polaridades para escala 0-5
@@ -51,7 +49,21 @@ Calcula o erro (SSE) por reclamação
 
 ```{r}
 reclamacoes_l = reclamacoes_l %>%
-    mutate(erro = (insatisfacao - polaridade_normalizada)**2)
+    mutate(erro = (insatisfacao - polaridade_normalizada)**2) 
+
+reclamacoes_op30 = reclamacoes_l %>% 
+    filter(lexico == "sentimento_op30") %>%
+    mutate(erro_op30 = erro, polaridade_op30 = polaridade_normalizada) %>%
+    select(id, insatisfacao, polaridade_op30, erro_op30)
+
+reclamacoes_sent = reclamacoes_l %>% 
+    filter(lexico == "sentimento_sent") %>%
+    mutate(erro_sent = erro, polaridade_sent = polaridade_normalizada) %>%
+    select(id, insatisfacao, polaridade_sent, erro_sent)
+
+reclamacoes_joined = reclamacoes_op30 %>%
+    left_join(reclamacoes_sent, by = "id") %>% 
+    select(id, insatisfacao.x, polaridade_op30, polaridade_sent, erro_op30, erro_sent) %>% View()
 ```
 
 ## EDA
