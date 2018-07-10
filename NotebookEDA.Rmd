@@ -22,7 +22,7 @@ reclamacoes <-  read_csv("data/1-reclamacoes-selecionadas/reclamacoes-avaliadas.
 reclamacoes <- reclamacoes %>% mutate(reclamacao.length = str_length(reclamacao),
                                       titulo.length = str_length(titulo))
 
-# insere coluna com número de letras em capslock
+# insere coluna com número de palavras em capslock
 reclamacoes$numero.de.capslock <- str_count(reclamacoes$reclamacao, "\\b[A-Z]+\\b")
 ```
 
@@ -39,12 +39,18 @@ Com isso, focamos no dado de capslock e realizamos a seguinte análise:
 
 ```{r}
 reclamacoes$numero.de.capslock.titulo <- str_count(reclamacoes$titulo, "\\b[A-Z]+\\b")
+reclamacoes$numero.de.capslock.letras_titulo <- str_count(reclamacoes$titulo, "[A-Z]+")
+reclamacoes$numero.de.capslock.letras_reclamacao <- str_count(reclamacoes$reclamacao, "[A-Z]+")
 
-# A quantidade de capslock na reclamação tem relação com o tamanho da mesma?
+# A quantidade de palavras em capslock na reclamação tem relação com o tamanho da mesma?
 reclamacoes %>% ggplot(aes(x=reclamacao.length, y=numero.de.capslock)) + geom_point()
+# A quantidade de letras em capslock na reclamação tem relação com o tamanho da mesma?
+reclamacoes %>% ggplot(aes(x=reclamacao.length, y=numero.de.capslock.letras_reclamacao)) + geom_point()
 
-# A quantidade de capslock no título tem relação com o tamanho do mesmo?
+# A quantidade de palavras em capslock no título tem relação com o tamanho do mesmo?
 reclamacoes %>% ggplot(aes(x=titulo.length, y=numero.de.capslock.titulo)) + geom_point()
+# A quantidade de letras em capslock no título tem relação com o tamanho do mesmo?
+reclamacoes %>% ggplot(aes(x=titulo.length, y=numero.de.capslock.letras_titulo)) + geom_point()
 ```
 
 
