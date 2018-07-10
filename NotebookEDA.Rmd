@@ -1,0 +1,61 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+
+## Notebook de EDA
+
+Após o exemplo de EDA da professora...
+
+```{r}
+avaliacoes <- read_csv("data/3-avaliacao-humana/avaliacoes-20180610.csv")
+reclamacoes <-  read_csv("data/1-reclamacoes-selecionadas/reclamacoes-avaliadas.csv")
+
+#inserindo colunas comprimento da reclamacao e do titulo
+reclamacoes <- reclamacoes %>% mutate(reclamacao.length = str_length(reclamacao),
+                                      titulo.length = str_length(titulo))
+
+# insere coluna com número de letras em capslock
+reclamacoes$numero.de.capslock <- str_count(reclamacoes$reclamacao, "\\b[A-Z]+\\b")
+```
+
+... iniciamos nossa análise exploratória dos dados inspirados nas seguintes questões já existentes:
+
+```{r}
+## Será que os tamanhos das reclamações ou títulos tem alguma relação com o nível de insatisfação?
+reclamacoes %>% ggplot(aes(x=mediana, y=reclamacao.length)) + geom_point()
+reclamacoes %>% ggplot(aes(x=mediana, y=numero.de.capslock)) + geom_point()
+reclamacoes %>% ggplot(aes(x=mediana, y=titulo.length)) + geom_point()
+```
+
+Com isso, focamos no dado de capslock e realizamos a seguinte análise:
+
+```{r}
+reclamacoes$numero.de.capslock.titulo <- str_count(reclamacoes$titulo, "\\b[A-Z]+\\b")
+
+# A quantidade de capslock na reclamação tem relação com o tamanho da mesma?
+reclamacoes %>% ggplot(aes(x=reclamacao.length, y=numero.de.capslock)) + geom_point()
+
+# A quantidade de capslock no título tem relação com o tamanho do mesmo?
+reclamacoes %>% ggplot(aes(x=titulo.length, y=numero.de.capslock.titulo)) + geom_point()
+```
+
+
+<!--
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+-->
