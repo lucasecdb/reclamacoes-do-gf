@@ -89,36 +89,22 @@ Agora um modelo para responder sua pergunta.
 ```{r}
 # Cria variável dummy para preditor categórico
 reclamacoes_l = reclamacoes_l %>% mutate(lexico.dummy = if_else(lexico == "sentimento_sent", 1, 0))
+reclamacoes_l = reclamacoes_l %>% mutate(orgao.dummy = if_else(orgao == "anac-agencia-nacional-de-aviacao-civil", 1, 0))
 # Você precisa entender o que fez acima para interpretar sua regressão
 # Você pode também criar uma variável dummy para o órgao (se anac ou inss)
 
 # ggpairs(reclamacoes_l %>% select(<selecione as colulas que vc quer usar aqui>))
 # lm1 = lm(<seu modelo>)
 
-ggpairs(reclamacoes_l %>% select(lexico, lexico.dummy, erro))
+ggpairs(reclamacoes_l %>% select(lexico, orgao, orgao.dummy, erro))
 
-x = reclamacoes_l$erro
-y = reclamacoes_l$lexico.dummy
+lm1 = lm(erro ~ orgao.dummy, data = reclamacoes_l)
 
-lm1 = lm(x ~ y)
-
-plot(x, y)
+plot(reclamacoes_l$orgao.dummy, reclamacoes_l$erro)
 abline(lm1)
-f <- lm1
-summary(f)
+summary(lm1)
 
-ci = function(xbar, s , n, alpha = 0.05) {
-    q = 1 - alpha/2
-    if (n >= 30)
-        error = qnorm(q)*s
-    else
-        error = qt(q, df = n-2)*s
-    lower = xbar-error
-    upper = xbar+error
-    return(data.frame(lower, upper))
-}
-
-ci(2.2000, -0.1333, 60)
+confint(lm1)
 
 ```
 
