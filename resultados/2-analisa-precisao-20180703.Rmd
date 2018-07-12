@@ -8,6 +8,7 @@ library(tidyverse)
 library(here)
 library(modelr)
 library(broom)
+library(GGally)
 
 theme_set(theme_bw())
 ```
@@ -49,21 +50,7 @@ Calcula o erro (SSE) por reclamação
 
 ```{r}
 reclamacoes_l = reclamacoes_l %>%
-    mutate(erro = (insatisfacao - polaridade_normalizada)**2) 
-
-reclamacoes_op30 = reclamacoes_l %>% 
-    filter(lexico == "sentimento_op30") %>%
-    mutate(erro_op30 = erro, polaridade_op30 = polaridade_normalizada) %>%
-    select(id, insatisfacao, polaridade_op30, erro_op30)
-
-reclamacoes_sent = reclamacoes_l %>% 
-    filter(lexico == "sentimento_sent") %>%
-    mutate(erro_sent = erro, polaridade_sent = polaridade_normalizada) %>%
-    select(id, insatisfacao, polaridade_sent, erro_sent)
-
-reclamacoes_joined = reclamacoes_op30 %>%
-    left_join(reclamacoes_sent, by = "id") %>% 
-    select(id, insatisfacao.x, polaridade_op30, polaridade_sent, erro_op30, erro_sent) %>% View()
+    mutate(erro = (insatisfacao - polaridade_normalizada)**2)
 ```
 
 ## EDA
@@ -100,14 +87,41 @@ reclamacoes_l %>%
 Agora um modelo para responder sua pergunta.
 
 ```{r}
-#Cria variável dummy para preditor categórico
+# Cria variável dummy para preditor categórico
 reclamacoes_l = reclamacoes_l %>% mutate(lexico.dummy = if_else(lexico == "sentimento_sent", 1, 0))
-#Você precisa entender o que fez acima para interpretar sua regressão
-#Você pode também criar uma variável dummy para o órgao (se anac ou inss)
+# Você precisa entender o que fez acima para interpretar sua regressão
+# Você pode também criar uma variável dummy para o órgao (se anac ou inss)
 
 # ggpairs(reclamacoes_l %>% select(<selecione as colulas que vc quer usar aqui>))
 # lm1 = lm(<seu modelo>)
+
+ggpairs(reclamacoes_l %>% select(lexico, lexico.dummy, erro))
+
+x = reclamacoes_l$erro
+y = reclamacoes_l$lexico.dummy
+
+lm1 = lm(x ~ y)
+
+plot(x, y)
+abline(lm1)
+f <- lm1
+summary(f)
+
+ci = function(xbar, s , n, alpha = 0.05) {
+    q = 1 - alpha/2
+    if (n >= 30)
+        error = qnorm(q)*s
+    else
+        error = qt(q, df = n-2)*s
+    lower = xbar-error
+    upper = xbar+error
+    return(data.frame(lower, upper))
+}
+
+ci(2.2000, -0.1333, 60)
+
 ```
+
 
 **Dica** - o texto de resultado que queremos produzir é algo como:
 
