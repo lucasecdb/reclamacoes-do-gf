@@ -98,7 +98,7 @@ reclamacoes_l = reclamacoes_l %>% mutate(orgao.dummy = if_else(orgao == "anac-ag
 
 ggpairs(reclamacoes_l %>% select(lexico, orgao, orgao.dummy, erro))
 
-lm1 = lm(erro ~ orgao.dummy, data = reclamacoes_l)
+lm1 = lm(erro ~ orgao.dummy + lexico.dummy, data = reclamacoes_l)
 
 plot(reclamacoes_l$orgao.dummy, reclamacoes_l$erro)
 abline(lm1)
