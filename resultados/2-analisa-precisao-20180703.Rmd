@@ -82,6 +82,14 @@ reclamacoes_l %>%
     facet_wrap(~ lexico)
 ```
 
+## Definição da eficácia dos léxicos
+
+```{r}
+reclamacoes_l %>%
+    group_by(lexico) %>%
+    summarise(rmse = sqrt(mean(erro)))
+```
+
 ## Há relação entre o léxico e o erro?
 
 Agora um modelo para responder sua pergunta.
